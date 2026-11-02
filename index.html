@@ -1,0 +1,434 @@
+
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f7f0e4">
+
+  <title>Нуркамил & Назми</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      background: #f5efe4;
+      color: #765323;
+      overflow-x: hidden;
+    }
+
+    /* БИРИНЧИ ЭКРАН — КОНВЕРТ */
+
+    .envelope-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      background:
+        radial-gradient(circle, #fffdf7, #e9dcc4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      transition: opacity 1s ease, visibility 1s ease;
+    }
+
+    .envelope-screen.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .envelope {
+      position: relative;
+      width: min(82vw, 340px);
+      height: 220px;
+      background: #d7b66e;
+      border-radius: 5px;
+      box-shadow: 0 15px 45px #8b6a3c55;
+      cursor: pointer;
+      perspective: 1000px;
+    }
+
+    .envelope::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background: linear-gradient(
+        145deg,
+        #f8e9c5,
+        #d8b56b
+      );
+      clip-path: polygon(0 0, 50% 58%, 100% 0);
+      transform-origin: top;
+      transition: transform 1s ease;
+    }
+
+    .envelope.open::before {
+      transform: rotateX(180deg);
+      z-index: 0;
+    }
+
+    .envelope::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        linear-gradient(35deg, #c59a4d, transparent 50%),
+        linear-gradient(-35deg, #e8ce91, transparent 50%);
+      clip-path: polygon(0 0, 50% 55%, 100% 0,
+                         100% 100%, 0 100%);
+    }
+
+    .envelope-letter {
+      position: absolute;
+      top: 15px;
+      left: 8%;
+      width: 84%;
+      height: 85%;
+      background: #fffdf8;
+      z-index: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #9a773d;
+      font-size: 23px;
+      font-style: italic;
+      transition: transform 1s ease;
+    }
+
+    .envelope.open .envelope-letter {
+      transform: translateY(-130px);
+    }
+
+    .seal {
+      position: absolute;
+      z-index: 3;
+      left: 50%;
+      top: 48%;
+      transform: translate(-50%, -50%);
+      width: 65px;
+      height: 65px;
+      border: 2px solid #fff1cf;
+      border-radius: 50%;
+      background: #a87c35;
+      color: #fff6df;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 25px;
+      box-shadow: 0 3px 10px #76532355;
+      transition: opacity .5s;
+    }
+
+    .envelope.open .seal {
+      opacity: 0;
+    }
+
+    .open-text {
+      margin-top: 40px;
+      color: #8d6b36;
+      font-size: 18px;
+      letter-spacing: 3px;
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .45; }
+    }
+
+    /* ЭКИНЧИ ЭКРАН — ЧАКЫРУУ */
+
+    .invitation-page {
+      display: none;
+      min-height: 100vh;
+      padding: 25px 12px 50px;
+      text-align: center;
+      animation: appear 1.5s ease;
+    }
+
+    .invitation-page.show {
+      display: block;
+    }
+
+    @keyframes appear {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .invitation-card {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 12px;
+      background: #fffdf8;
+      border: 3px solid #c8a35e;
+      box-shadow: 0 10px 35px #886a3940;
+      position: relative;
+    }
+
+    .invitation-design {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .couple-photo {
+      width: 100%;
+      max-height: 550px;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      margin-top: 18px;
+      border: 2px solid #c8a35e;
+    }
+
+    .names {
+      margin: 30px 0 15px;
+      color: #956e31;
+      font-size: clamp(30px, 8vw, 43px);
+      font-weight: normal;
+      font-style: italic;
+      letter-spacing: 2px;
+    }
+
+    .ornament {
+      color: #b08a4c;
+      font-size: 28px;
+      margin: 15px 0;
+    }
+
+    /* МУЗЫКА */
+
+    .music-button {
+      position: fixed;
+      right: 20px;
+      bottom: 22px;
+      z-index: 20;
+      width: 52px;
+      height: 52px;
+      border: 2px solid #c8a35e;
+      border-radius: 50%;
+      background: #fffaf0;
+      color: #936c32;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px #0002;
+      display: none;
+    }
+
+    .music-button.show {
+      display: block;
+    }
+
+    .music-button.playing {
+      animation: rotate 4s linear infinite;
+    }
+
+    @keyframes rotate {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 400px) {
+      .envelope {
+        height: 190px;
+      }
+
+      .invitation-page {
+        padding: 12px 8px 35px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- КОНВЕРТ -->
+
+  <section class="envelope-screen" id="envelopeScreen">
+
+    <div class="envelope" id="envelope"
+         role="button"
+         tabindex="0"
+         aria-label="Чакыруу конвертин ачуу">
+
+      <div class="envelope-letter">
+        Нуркамил & Назми
+      </div>
+
+      <div class="seal">❦</div>
+
+    </div>
+
+    <div class="open-text">АЧУУ</div>
+
+  </section>
+
+
+  <!-- ЧАКЫРУУ БАРАГЫ -->
+
+  <main class="invitation-page" id="invitationPage">
+
+    <div class="invitation-card">
+
+      <!-- Биринчи сүрөт: чакыруу дизайны -->
+
+      <img
+        class="invitation-design"
+        src="images/invitation.jpg"
+        alt="Шеринеге чакыруу"
+      >
+
+      <div class="ornament">❦</div>
+
+      <!-- Экинчи сүрөт: шерине ээлери -->
+
+      <img
+        class="couple-photo"
+        src="images/couple.jpg"
+        alt="Нуркамил жана Назми"
+      >
+
+      <h1 class="names">
+        Нуркамил & Назми
+      </h1>
+
+      <div class="ornament">❦</div>
+
+    </div>
+
+  </main>
+
+
+  <!-- МУЗЫКА -->
+
+  <audio id="backgroundMusic"
+         src="music/music.mp4"
+         loop
+         preload="auto">
+  </audio>
+
+  <button
+    class="music-button"
+    id="musicButton"
+    aria-label="Музыканы токтотуу"
+    title="Музыка"
+  >
+    ♫
+  </button>
+
+
+  <!-- JAVASCRIPT -->
+
+  <script>
+
+    const envelope = document.getElementById("envelope");
+
+    const envelopeScreen =
+      document.getElementById("envelopeScreen");
+
+    const invitationPage =
+      document.getElementById("invitationPage");
+
+    const music =
+      document.getElementById("backgroundMusic");
+
+    const musicButton =
+      document.getElementById("musicButton");
+
+    let opened = false;
+
+    function openInvitation() {
+
+      if (opened) return;
+
+      opened = true;
+
+      // Конверт ачылат
+      envelope.classList.add("open");
+
+      // Музыка башталат
+      music.volume = 0.65;
+
+      music.play().then(() => {
+        musicButton.classList.add("playing");
+        musicButton.setAttribute(
+          "aria-label", "Музыканы токтотуу"
+        );
+      }).catch(() => {
+        // Эгер музыка башталбаса,
+        // төмөнкү баскыч аркылуу күйгүзсө болот.
+      });
+
+      musicButton.classList.add("show");
+
+      // Чакыруу барагы ачылат
+      setTimeout(() => {
+
+        envelopeScreen.classList.add("hide");
+
+        invitationPage.classList.add("show");
+
+      }, 1100);
+    }
+
+    // Конвертти басуу
+    envelope.addEventListener("click", openInvitation);
+
+    // Клавиатура менен ачуу
+    envelope.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openInvitation();
+      }
+    });
+
+    // Музыканы башкаруу
+    musicButton.addEventListener("click", () => {
+
+      if (music.paused) {
+
+        music.play().then(() => {
+          musicButton.classList.add("playing");
+          musicButton.setAttribute(
+            "aria-label", "Музыканы токтотуу"
+          );
+        }).catch(() => {});
+
+      } else {
+
+        music.pause();
+
+        musicButton.classList.remove("playing");
+
+        musicButton.setAttribute(
+          "aria-label", "Музыканы күйгүзүү"
+        );
+
+      }
+
+    });
+
+  </script>
+
+</body>
+</html>
